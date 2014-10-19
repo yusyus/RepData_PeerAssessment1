@@ -5,21 +5,59 @@ output:
     keep_md: true
 ---
 
-
 ## Loading and preprocessing the data
 
+```{r echo = TRUE}
+Data <- read.csv(file="activity.csv", header=TRUE, sep=",")
+```
 
 
 ## What is mean total number of steps taken per day?
+```{r echo = TRUE}
+d <- na.omit(Data)
+D <- aggregate(d$steps, by=list(d$date), FUN=sum)
+names(D) <- c("Day" , "Steps")
 
+barplot(D$Steps , main="Steps taken per day", col=c("blue","orange"),
+  xlab="Day", ylab="Number of steps", cex.axis=0.6, cex.names=0.4,
+  names.arg = D$Day, las= 2, beside = TRUE)
+
+mean(D$Steps)
+median(D$Steps)
+```
 
 
 ## What is the average daily activity pattern?
+```{r echo = TRUE}
+D2 <- aggregate(d$steps, by=list(d$interval), FUN=mean)
+names(D2) <- c("Interval","Steps")
+with(D2, plot( D2$Interval, D2$Steps, type="l",
+                xlab="5-minute interval", 
+                ylab=expression("average number of steps taken"), 
+                main=expression(atop("Average daily activity pattern") ) ) )
+subset(D2$Interval, D2$Steps==max(D2$Steps))
+D2[D2$Steps==max(D2$Steps),]
+```
 
 
 
 ## Imputing missing values
+```{r echo = TRUE}
+sum(is.na(Data))
+D3 <- data.frame(ifelse(is.na(Data$steps), D2$Steps[match(D2$Interval, Data$interval)], Data$steps), Data$date,Data$interval)
+names(D3) <- c("Steps","Day","Interval")
+D3s <- aggregate(D3$Steps, by=list(D3$Day), FUN=sum)
+names(D3s) <- c("Day","Steps")
 
+barplot(D3s$Steps , main="Steps taken per day", col=c("blue","orange"),
+  xlab="Day", ylab="Number of steps", cex.axis=0.6, cex.names=0.4,
+  names.arg = D3s$Day, las= 2, beside = TRUE)
+
+mean(D3s$Steps)
+median(D3s$Steps)
+```
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+```{r echo = TRUE}
+```
